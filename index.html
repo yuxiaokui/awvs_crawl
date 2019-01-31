@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>
+Xi4okv WVS
+</title>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+<body>
+<div id="app">
+Xi4okv WVS
+<br>
+<input v-model="website" placeholder="http://www.baidu.com">
+<button  @click="scan">扫一下</button>
+<br>--------------------邪恶的分割线---------------------------<br>
+<button  @click="view">报告列表</button>
+  <ol>
+    <li v-for="filename in filelist">
+      {{ filename }}<button  @click="listurl(filename)">看报告</button><button  @click="del(filename)">删除</button>
+    </li>
+  </ol>
+<br>--------------------邪恶的分割线---------------------------<br>
+  <ol>
+    <li v-for="res in result">
+      {{ res }}
+    </li>
+  </ol>
+</div>
+<script>
+var app = new Vue({
+  el: '#app',
+  data: {
+    website: '',
+    filelist:'',
+    result: ''
+  },
+  methods:{ 
+   view(){
+    app.filelist = []
+    var wvsServer = "http://172.0.0.1:5000";
+            $.ajax({
+                type : "get",
+                url : wvsServer + '/view',
+                success: function (response) {
+                    app.filelist = response.replace('[','').replace(']','').replace(new RegExp('u', 'g'),'').replace(new RegExp('\'', 'g'),'').split(', ')
+                }
+            })
+   },
+   del(filename){
+    app.result = []
+    var wvsServer = "http://172.0.0.1:5000";
+            $.ajax({
+                type : "post",
+                url : wvsServer + '/del',
+                data : {
+                    filename:filename
+                }
+            })
+    app.filelist.pop(filename)
+            
+      },
+  
+   scan(){
+    app.result = []
+    var wvsServer = "http://172.0.0.1:5000";
+            $.ajax({
+                type : "post",
+                url : wvsServer + '/scan',
+                data : {
+                    website:this.website
+                }
+            })
+            
+      },
+  
+  
+   listurl(filename){
+    app.result = []
+    var wvsServer = "http://172.0.0.1:5000";
+            $.ajax({
+                type : "post",
+                url : wvsServer + '/listurl',
+                data : {
+                    filename:filename
+                },
+                success: function (response) {
+                    app.result = response.replace('[','').replace(']','').replace(new RegExp('\'', 'g'),'').split(', ')
+                }
+            })
+            
+
+      }
+  }
+})
+
+
+</script>
+</body>
+</html>
